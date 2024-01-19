@@ -1,25 +1,49 @@
-import OpenAI from "openai";
-import { OpenAIStream, StreamingTextResponse } from "ai";
+import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
+import { NextResponse } from "next/server";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+export async function POST(request: Request): Promise<NextResponse> {
+  const body = (await request.json()) as HandleUploadBody;
 
-export async function POST(req: Request) {
-  const { messages } = await req.json();
+  try {
+    const jsonResponse = await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async (
+        pathname: string,
+        clientPayload: string | null,
+      ) => {
+        // Generate a client token for the browser to upload the file
+        // ⚠️ Authenticate and authorize users before generating the token.
+        // Otherwise, you're allowing anonymous uploads.
 
-  const systemPrompt = {
-    role: "system",
-    content:
-      "You are a snarky chat assistant that is part of a software engineering interview excercise that I'm creating in real time.",
-  };
+        return {
+          tokenPayload: JSON.stringify({
+            // optional, sent to your server on upload completion
+            // you could pass a user id from auth, or a value from clientPayload
+          }),
+        };
+      },
+      onUploadCompleted: async ({ blob, tokenPayload }) => {
+        // Get notified of client upload completion
+        // ⚠️ This will not work on `localhost` websites,
+        // Use ngrok or similar to get the full upload flow
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-3.5-turbo",
-    stream: true,
-    messages: [systemPrompt, ...messages],
-  });
+        console.log("blob upload completed", blob, tokenPayload);
 
-  const stream = OpenAIStream(response);
-  return new StreamingTextResponse(stream);
+        try {
+          //kick off RAG file processing
+          console.log("kick off RAG file processing");
+        } catch (error) {
+          throw new Error("Could not process file");
+        }
+      },
+    });
+
+    return NextResponse.json(jsonResponse);
+  } catch (error) {
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 400 }, // The webhook will retry 5 times waiting for a 200
+    );
+  }
 }

@@ -1,13 +1,15 @@
 "use client";
 
 import { useChat } from "ai/react";
+import { useRef, RefObject } from "react";
 
 export default function Home() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
+  const inputFileRef: RefObject<HTMLInputElement> = useRef(null);
 
   return (
     <main className="flex min-h-screen flex-col lg:w-1/3 sm:w-full mx-auto py-24">
-      <div className="scroll-auto flex-grow flex-col bg-gray-800 rounded-lg h-5/6">
+      <div className="scroll-auto flex-grow flex-col rounded-lg h-5/6">
         {messages.map((message) => {
           return (
             <div
@@ -18,7 +20,9 @@ export default function Home() {
             >
               <div
                 className={`rounded-lg py-2 px-2.5 ${
-                  message.role === "user" ? "bg-gray-700" : "bg-blue-900"
+                  message.role === "user"
+                    ? "bg-neutral-800 text-neutral-100 shadow-md"
+                    : "bg-stone-800 text-stone-100 border border-stone-700 shadow-md"
                 }`}
               >
                 {message.content}
@@ -27,37 +31,59 @@ export default function Home() {
           );
         })}
       </div>
+
       <div className="p-4">
         <form
           onSubmit={handleSubmit}
-          className="flex w-full bg-gray-800 rounded-lg ring-transparent focus-within:ring-1 focus-within:ring-blue-900"
+          className="flex w-full bg-stone-800 rounded-lg ring-transparent focus-within:ring-1 focus-within:ring-stone-700 text-stone-200"
         >
-          <button className="bg-transparent text-gray-300 rounded-md p-2 hover:text-white transition-colors ease-in-out">
+          <input name="file" ref={inputFileRef} type="file" hidden />
+          <button
+            type="button"
+            className="bg-transparent rounded-md p-2 hover:text-white transition-colors ease-in-out"
+            onClick={(e) => {
+              e.preventDefault();
+              inputFileRef.current?.click();
+            }}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              height="28"
-              viewBox="0 -960 960 960"
-              width="28"
-              className="fill-current"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              className="w-6 h-6"
             >
-              <path d="M440-367v127q0 17 11.5 28.5T480-200q17 0 28.5-11.5T520-240v-127l36 36q6 6 13.5 9t15 2.5q7.5-.5 14.5-3.5t13-9q11-12 11.5-28T612-388L508-492q-6-6-13-8.5t-15-2.5q-8 0-15 2.5t-13 8.5L348-388q-12 12-11.5 28t12.5 28q12 11 28 11.5t28-11.5l35-35ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h287q16 0 30.5 6t25.5 17l194 194q11 11 17 25.5t6 30.5v447q0 33-23.5 56.5T720-80H240Zm280-560v-160H240v640h480v-440H560q-17 0-28.5-11.5T520-640ZM240-800v200-200 640-640Z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15"
+              />
             </svg>
           </button>
           <input
-            className="w-full bg-transparent text-white p-2 focus:outline-none"
-            placeholder="Chat here..."
+            className="w-full bg-transparent p-2 focus:outline-none"
+            placeholder="Message your RAG bot..."
             onChange={handleInputChange}
             value={input}
           />
-          <button className="bg-transparent text-gray-300 rounded-md p-2 hover:text-white transition-colors ease-in-out">
+          <button
+            type="submit"
+            className="bg-transparent rounded-md p-2 hover:text-white transition-colors ease-in-out"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              height="28"
-              viewBox="0 -960 960 960"
-              width="28"
-              className="fill-current"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              className="w-6 h-6"
             >
-              <path d="M792-443 176-183q-20 8-38-3.5T120-220v-520q0-22 18-33.5t38-3.5l616 260q25 11 25 37t-25 37ZM200-280l474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+              />
             </svg>
           </button>
         </form>
