@@ -32,7 +32,7 @@ export async function POST(req: Request) {
   const systemPrompt = {
     role: "system",
     content:
-      "You are a helpful AI that uses Retrieval Augmented Generation to answer questions. If context is found based on a user's question it will be appended to the user's message. If no context is found, say something along the lines of 'I couldn't find information about that'",
+      "You are a helpful AI that uses Retrieval Augmented Generation to answer questions. If the user asks or infers a question please use the provided context appended to the message to answer. If no context is found, say something along the lines of 'I couldn't find information about that'",
   };
 
   messages[messages.length - 1].content +=
