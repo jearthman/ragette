@@ -6,7 +6,7 @@ export default function CheckIcon() {
       viewBox="0 0 24 24"
       strokeWidth="1.5"
       stroke="currentColor"
-      className="h-6 w-6 text-green-600"
+      className="h-6 w-6 text-lime-600"
     >
       <path
         strokeLinecap="round"

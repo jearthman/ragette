@@ -2,15 +2,34 @@
 
 import { upload } from "@vercel/blob/client";
 import { useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import SpinnerIcon from "../components/icons/spinner";
 import CheckIcon from "../components/icons/check";
+import { useRouter } from "next/navigation";
 
-export default function AvatarUploadPage() {
+export default function FileUploadPage() {
+  const router = useRouter();
   const inputFileRef = useRef<HTMLInputElement>(null);
+  const fileIdRef = useRef<string | null>(null);
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
   const [uploadStep, setUploadStep] = useState(0);
+
+  const generateID = (): string => {
+    //ID for astra collection name
+
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
+
+    let result = characters.charAt(Math.floor(Math.random() * 52));
+
+    for (let i = 1; i < 16; i++) {
+      result += characters.charAt(
+        Math.floor(Math.random() * characters.length),
+      );
+    }
+
+    return result;
+  };
 
   return (
     <main className="flex h-screen w-screen flex-col items-center">
@@ -39,20 +58,40 @@ export default function AvatarUploadPage() {
             }
 
             setFileName(file.name.split(".")[0]);
-            setFileType(file.type.split("/")[1].toUpperCase());
+            if (file.type) {
+              setFileType(file.type?.split("/")[1].toUpperCase());
+            } else {
+              setFileType(file.name.split(".")[1].toUpperCase());
+            }
 
             setUploadStep(1);
 
-            const response = await upload(file.name, file, {
+            fileIdRef.current = generateID();
+
+            const uploadResponse = await upload(file.name, file, {
               access: "public",
               handleUploadUrl: "/api/upload",
-              clientPayload: uuidv4(),
+              clientPayload: fileIdRef.current,
             });
 
-            if (response.url) {
+            if (uploadResponse.url) {
               setUploadStep(2);
 
               //send url to rag backend
+              const embedResponse = await fetch("/api/embed", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  fileUrl: uploadResponse.url,
+                  fileId: fileIdRef.current,
+                }),
+              });
+
+              if (embedResponse.ok) {
+                setUploadStep(3);
+              }
             }
           }}
         />
@@ -71,7 +110,7 @@ export default function AvatarUploadPage() {
             viewBox="0 0 24 24"
             strokeWidth="1.5"
             stroke="currentColor"
-            className="mr-1 h-6 w-6"
+            className="mr-1 h-6 w-6 animate-bounce-up"
           >
             <path
               strokeLinecap="round"
@@ -83,36 +122,47 @@ export default function AvatarUploadPage() {
         </button>
       </form>
       {!!uploadStep && (
-        <div className="flex flex-col">
-          <div className="mb-4 mt-12 flex items-center gap-2 self-center text-stone-300">
-            <div className="font-semibold">{fileName}</div>
-            <div className="rounded-full border border-amber-400 bg-amber-300 px-1 py-0.5 text-xs font-bold text-amber-700">
-              {fileType}
-            </div>
-          </div>
-
-          <div className="flex w-64 items-center lg:w-1/6">
-            <div
-              className={`mr-2 flex h-7 w-7 items-center justify-center rounded-full bg-stone-700`}
-            >
-              {uploadStep === 1 && <SpinnerIcon />}
-              {uploadStep === 2 && <CheckIcon />}
-            </div>
-            <div className="text-stone-400">Uploading to Blob Storage</div>
-          </div>
-
-          {uploadStep === 2 && (
-            <>
-              <div className="my-1 ml-3 h-3 w-1 rounded-full bg-stone-700 opacity-70"></div>
-              <div className="flex w-64 items-center lg:w-1/6">
-                <div className="mr-2 flex h-7 w-7 items-center justify-center rounded-full bg-stone-700">
-                  <SpinnerIcon />
-                </div>
-                <div className="text-stone-400">Splitting up Doc</div>
+        <>
+          <div className="flex w-72 flex-col">
+            <div className="mb-4 mt-12 flex animate-fade-in items-center gap-2 self-center text-stone-300">
+              <div className="font-semibold">{fileName}</div>
+              <div className="rounded-full border border-amber-400 bg-amber-300 px-1 py-0.5 text-xs font-bold text-amber-700">
+                {fileType}
               </div>
-            </>
+            </div>
+
+            <div className="flex animate-fade-in items-center">
+              <div
+                className={`mr-2 flex h-7 w-7 items-center justify-center rounded-full bg-stone-700`}
+              >
+                {uploadStep === 1 && <SpinnerIcon />}
+                {uploadStep >= 2 && <CheckIcon />}
+              </div>
+              <div className="text-stone-400">Uploading to Blob Storage</div>
+            </div>
+
+            {uploadStep >= 2 && (
+              <div className="animate-fade-in-from-below">
+                <div className="my-1 ml-3 h-3 w-1 rounded-full bg-stone-700 opacity-70"></div>
+                <div className="flex items-center">
+                  <div className="mr-2 flex h-7 w-7 items-center justify-center rounded-full bg-stone-700">
+                    {uploadStep === 2 && <SpinnerIcon />}
+                    {uploadStep === 3 && <CheckIcon />}
+                  </div>
+                  <div className="text-stone-400">Embedding for Vector DB</div>
+                </div>
+              </div>
+            )}
+          </div>
+          {uploadStep === 3 && (
+            <button
+              onClick={() => router.push(`/chat?fileId=${fileIdRef.current}`)}
+              className="mt-4 animate-fade-in rounded-md bg-lime-800 px-2.5 py-2 text-lime-100 shadow-sm transition hover:bg-lime-700 hover:shadow-md active:bg-lime-700 active:shadow-inner disabled:opacity-30 disabled:hover:bg-lime-800"
+            >
+              Start Chat
+            </button>
           )}
-        </div>
+        </>
       )}
     </main>
   );
