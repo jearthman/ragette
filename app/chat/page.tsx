@@ -37,7 +37,7 @@ export default function ChatPage() {
       <div className="p-4">
         <form
           onSubmit={(e) => handleSubmit(e, { options: { body: { fileId } } })}
-          className="flex w-full rounded-lg bg-stone-800 text-stone-200 ring-transparent focus-within:ring-1 focus-within:ring-stone-700"
+          className="flex w-full rounded-lg bg-stone-800 text-stone-300 ring-transparent focus-within:ring-1 focus-within:ring-stone-700"
         >
           <input
             className="w-full bg-transparent p-2 focus:outline-none"
