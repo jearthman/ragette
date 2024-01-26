@@ -9,9 +9,9 @@ export async function POST(request: Request): Promise<Response> {
 
   const file = await fileResponse.blob();
   try {
-    const retrievaResult = vectorizeFile(file, fileId);
+    const retrievalResult = vectorizeFile(file, fileId);
 
-    return new Response(JSON.stringify(retrievaResult), { status: 200 });
+    return new Response(JSON.stringify(retrievalResult), { status: 200 });
   } catch (error) {
     console.log(error);
     return new Response("Error uploading file to vectorDB", { status: 403 });

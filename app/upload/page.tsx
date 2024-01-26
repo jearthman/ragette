@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import SpinnerIcon from "../components/icons/spinner";
 import CheckIcon from "../components/icons/check";
 import { useRouter } from "next/navigation";
+import ChatIcon from "../components/icons/chat";
 
 export default function FileUploadPage() {
   const router = useRouter();
@@ -157,8 +158,9 @@ export default function FileUploadPage() {
           {uploadStep === 3 && (
             <button
               onClick={() => router.push(`/chat?fileId=${fileIdRef.current}`)}
-              className="mt-4 animate-fade-in rounded-md bg-lime-800 px-2.5 py-2 text-lime-100 shadow-sm transition hover:bg-lime-700 hover:shadow-md active:bg-lime-700 active:shadow-inner disabled:opacity-30 disabled:hover:bg-lime-800"
+              className="mt-4 flex animate-fade-in gap-2 rounded-md border border-lime-700 bg-lime-900 px-2.5 py-2 text-lime-100 shadow-sm transition hover:bg-lime-800 hover:shadow-md active:bg-lime-900 active:shadow-inner disabled:opacity-30 disabled:hover:bg-lime-800"
             >
+              <ChatIcon />
               Start Chat
             </button>
           )}
