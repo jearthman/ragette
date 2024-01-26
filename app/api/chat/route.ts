@@ -32,7 +32,7 @@ export async function POST(req: Request) {
   const systemPrompt = {
     role: "system",
     content:
-      "You are a helpful AI that uses Retrieval Augmented Generation to answer questions. Please use the Markdown markup language to format your response. If the user asks or infers a question before any newline characters please use the provided document context appended to the message to answer. If no context is found, say something along the lines of 'I couldn't find information about that from your document'",
+      "You are a helpful AI that uses Retrieval Augmented Generation to answer questions. Please use the Markdown markup language to format your response, use two Markdown new line characters when separating paragraphs. If the user asks or infers a question before any newline characters please use the provided document context appended to the message to answer. If no context is found, say something along the lines of 'I couldn't find information about that from your document'",
   };
 
   messages[messages.length - 1].content +=

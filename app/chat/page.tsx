@@ -26,7 +26,7 @@ export default function ChatPage() {
       <div className="absolute z-10 h-12 w-full bg-gradient-to-b from-stone-900 to-transparent md:h-24 md:w-1/3" />
       <div className="flex flex-grow flex-col overflow-auto rounded-lg px-2 text-sm md:text-base">
         {messages.length === 0 && (
-          <div className="animate-fade-in-half m-auto text-center text-lg text-stone-300 opacity-50">
+          <div className="animate-fade-in-half m-auto w-2/3 text-center text-lg text-stone-300 opacity-50">
             Please ask <span className="text-amber-400">RAGette</span> anything
             about your file.
           </div>

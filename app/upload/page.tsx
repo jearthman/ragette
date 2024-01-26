@@ -14,6 +14,7 @@ export default function FileUploadPage() {
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
   const [uploadStep, setUploadStep] = useState(0);
+  const [wrongFileType, setWrongFileType] = useState(false);
 
   const generateID = (): string => {
     //ID for astra collection name
@@ -37,9 +38,7 @@ export default function FileUploadPage() {
       <h1 className="mt-40 text-4xl font-bold tracking-wide text-stone-300 sm:mt-40 lg:mt-96">
         Upload Your <span className="underline decoration-amber-400">File</span>
       </h1>
-      <h3 className="text-md text-stone-400">
-        Supports .pdf, .csv, .txt, .docx
-      </h3>
+      <h3 className="text-md text-stone-400">Supports .pdf, .csv, .txt</h3>
 
       <form className="flex gap-2">
         <input
@@ -48,6 +47,8 @@ export default function FileUploadPage() {
           type="file"
           hidden
           onChange={async (e) => {
+            setWrongFileType(false);
+
             if (!e.target.files) {
               return;
             }
@@ -59,11 +60,18 @@ export default function FileUploadPage() {
             }
 
             setFileName(file.name.split(".")[0]);
-            if (file.type) {
-              setFileType(file.type?.split("/")[1].toUpperCase());
-            } else {
-              setFileType(file.name.split(".")[1].toUpperCase());
+            if (
+              !file.type ||
+              !(
+                file.type === "application/pdf" ||
+                file.type === "text/plain" ||
+                file.type === "text/csv"
+              )
+            ) {
+              setWrongFileType(true);
+              return;
             }
+            setFileType(file.name.split(".")[1].toUpperCase());
 
             setUploadStep(1);
 
@@ -103,7 +111,7 @@ export default function FileUploadPage() {
             inputFileRef.current?.click();
           }}
           type="submit"
-          disabled={!!fileName}
+          disabled={!!fileName && !wrongFileType}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -122,6 +130,12 @@ export default function FileUploadPage() {
           Upload
         </button>
       </form>
+      {wrongFileType && (
+        <div className="mt-6 w-2/3 text-center text-sm text-red-400">
+          File Type not supported currently. Please upload a .pdf, .csv, or .txt
+          file.
+        </div>
+      )}
       {!!uploadStep && (
         <>
           <div className="flex w-72 flex-col">
