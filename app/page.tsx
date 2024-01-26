@@ -7,14 +7,17 @@ import GithubSignInButton from "./components/github-sign-in-button";
 export default function Home() {
   return (
     <main className="flex h-screen w-screen flex-col items-center">
-      <Image
-        priority
-        src="/ragette.png"
-        alt="picture of ragette"
-        width={200}
-        height={200}
-        className="ml-3 mt-24 lg:mt-96"
-      ></Image>
+      <div className="relative">
+        <Image
+          priority
+          src="/ragette.png"
+          alt="picture of ragette"
+          width={200}
+          height={200}
+          className=" ml-3 mt-24 lg:mt-96"
+        ></Image>
+        <div className="absolute inset-0 bg-gradient-to-t from-stone-900 to-transparent to-20%"></div>
+      </div>
       <h1 className="mt-4 text-4xl font-bold tracking-wide text-stone-300 sm:mt-4 lg:mt-4">
         <span className="underline decoration-amber-400">RAG</span>ette
       </h1>
