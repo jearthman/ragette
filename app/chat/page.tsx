@@ -11,6 +11,11 @@ export default function ChatPage() {
 
   const { messages, input, handleInputChange, handleSubmit } = useChat();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -20,7 +25,13 @@ export default function ChatPage() {
     <main className="md:1/2 mx-auto flex h-screen w-full flex-col pb-2 lg:w-1/3">
       <div className="absolute z-10 h-12 w-full bg-gradient-to-b from-stone-900 to-transparent md:h-24 md:w-1/3" />
       <div className="flex flex-grow flex-col overflow-auto rounded-lg px-2 text-sm md:text-base">
-        {messages.map((message, index) => {
+        {messages.length === 0 && (
+          <div className="animate-fade-in-half m-auto text-center text-lg text-stone-300 opacity-50">
+            Please ask <span className="text-amber-400">RAGette</span> anything
+            about your file.
+          </div>
+        )}
+        {messages.map((message) => {
           return (
             <>
               <div
@@ -57,6 +68,7 @@ export default function ChatPage() {
         className="mx-2 flex rounded-lg bg-stone-800 text-stone-300 ring-transparent focus-within:ring-1 focus-within:ring-stone-700"
       >
         <input
+          ref={inputRef}
           className="w-full bg-transparent px-5 py-3 focus:outline-none"
           placeholder="Message your RAG bot..."
           onChange={handleInputChange}

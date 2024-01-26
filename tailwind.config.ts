@@ -17,6 +17,7 @@ const config: Config = {
         "bounce-up": "bounce-up 0.5s ease-in-out",
         "spin-fast": "spin 0.75s linear infinite",
         "fade-in": "fade-in 1s ease-in-out",
+        "fade-in-half": "fade-in-half 1s ease-in-out",
         "fade-in-from-below": "fade-in-from-below 1s ease-in-out",
       },
       keyframes: {
@@ -34,6 +35,14 @@ const config: Config = {
           },
           "100%": {
             opacity: "1",
+          },
+        },
+        "fade-in-half": {
+          "0%": {
+            opacity: "0",
+          },
+          "100%": {
+            opacity: "0.5",
           },
         },
         "fade-in-from-below": {
