@@ -146,7 +146,7 @@ export default function FileUploadPage() {
               </div>
             </div>
 
-            <div className="flex animate-fade-in items-center">
+            <div className="flex animate-fade-in items-center pl-6">
               <div
                 className={`mr-2 flex h-7 w-7 items-center justify-center rounded-full bg-stone-700`}
               >
@@ -157,7 +157,7 @@ export default function FileUploadPage() {
             </div>
 
             {uploadStep >= 2 && (
-              <div className="animate-fade-in-from-below">
+              <div className="animate-fade-in-from-below pl-6">
                 <div className="my-1 ml-3 h-3 w-1 rounded-full bg-stone-700 opacity-70"></div>
                 <div className="flex items-center">
                   <div className="mr-2 flex h-7 w-7 items-center justify-center rounded-full bg-stone-700">
