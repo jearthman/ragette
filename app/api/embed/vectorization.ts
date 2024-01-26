@@ -1,4 +1,4 @@
-import loaderFactory from "./loader-factory";
+import LoaderFactory from "./loader-factory";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { AstraDB } from "@datastax/astra-db-ts";
 import { OpenAIEmbeddings } from "@langchain/openai";
@@ -7,7 +7,7 @@ const { ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_API_ENDPOINT } = process.env;
 
 export default async function vectorizeFile(file: Blob, fileId: string) {
   try {
-    const loader = await loaderFactory(file);
+    const loader = await LoaderFactory(file);
 
     const docs = await loader.load();
 

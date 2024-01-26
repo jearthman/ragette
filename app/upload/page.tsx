@@ -38,7 +38,7 @@ export default function FileUploadPage() {
         Upload Your <span className="underline decoration-amber-400">File</span>
       </h1>
       <h3 className="text-md text-stone-400">
-        Supports .pdf, .csv, .txt, .word
+        Supports .pdf, .csv, .txt, .docx
       </h3>
 
       <form className="flex gap-2">

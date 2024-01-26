@@ -27,7 +27,7 @@ export default function Home() {
       <GoogleSignInButton />
       <div className="mx-auto mt-4 px-20 text-center text-sm text-stone-400">
         Please <span className="text-stone-300">Sign In</span> so I can moderate
-        naughty and gratuitous uploads
+        naughty and gratuitous uploads.
       </div>
     </main>
   );
