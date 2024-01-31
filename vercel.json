@@ -2,6 +2,12 @@
   "functions": {
     "app/api/chat/route.ts": {
       "maxDuration": 60
+    },
+    "app/api/upload.route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/embed.*.ts": {
+      "maxDuration": 60
     }
   }
 }
