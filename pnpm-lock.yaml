@@ -11,6 +11,9 @@ dependencies:
   '@langchain/openai':
     specifier: ^0.0.12
     version: 0.0.12
+  '@vercel/analytics':
+    specifier: ^1.1.2
+    version: 1.1.2
   '@vercel/blob':
     specifier: ^0.18.0
     version: 0.18.0
@@ -853,6 +856,12 @@ packages:
 
   /@ungap/structured-clone@1.2.0:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
+
+  /@vercel/analytics@1.1.2:
+    resolution: {integrity: sha512-CodhkLCQ/EHzjX8k+Qg+OzTBY0UadykrcfolfSOJVZZY/ZJM5nbhztm9KdbYvMfqKlasAr1+OYy0ThZnDA/MYA==}
+    dependencies:
+      server-only: 0.0.1
+    dev: false
 
   /@vercel/blob@0.18.0:
     resolution: {integrity: sha512-DKjzhGfvBIzYjAI8RLsoEWB8NYUkMXL3TQLeKO5V1qLglgckuetwtfnYPF0OeTLezklE9m//vMpBS0qkxP4RRA==}
@@ -4256,6 +4265,10 @@ packages:
   /seroval@1.0.4:
     resolution: {integrity: sha512-qQs/N+KfJu83rmszFQaTxcoJoPn6KNUruX4KmnmyD0oZkUoiNvJ1rpdYKDf4YHM05k+HOgCxa3yvf15QbVijGg==}
     engines: {node: '>=10'}
+    dev: false
+
+  /server-only@0.0.1:
+    resolution: {integrity: sha512-qepMx2JxAa5jjfzxG79yPPq+8BuFToHd1hm7kI+Z4zAq1ftQiP7HcxMhDDItrbtwVeLg/cY2JnKnrcFkmiswNA==}
     dev: false
 
   /set-function-length@1.2.0:
