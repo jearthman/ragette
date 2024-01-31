@@ -2,14 +2,17 @@
 
 import { useSearchParams } from "next/navigation";
 import { useChat } from "ai/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
+import SpinnerIcon from "../components/icons/spinner";
 
 export default function ChatPage() {
   const searchParams = useSearchParams();
   const fileId = searchParams.get("fileId");
 
-  const { messages, input, handleInputChange, handleSubmit } = useChat();
+  const { messages, isLoading, input, handleInputChange, handleSubmit } =
+    useChat();
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -26,7 +29,7 @@ export default function ChatPage() {
       <div className="absolute z-10 h-12 w-full bg-gradient-to-b from-stone-900 to-transparent md:h-24 md:w-1/3" />
       <div className="flex flex-grow flex-col overflow-auto rounded-lg px-2 text-sm md:text-base">
         {messages.length === 0 && (
-          <div className="animate-fade-in-half m-auto w-2/3 text-center text-lg text-stone-300 opacity-50">
+          <div className="m-auto w-2/3 animate-fade-in-half text-center text-lg text-stone-300 opacity-50">
             Please ask <span className="text-amber-400">RAGette</span> anything
             about your file.
           </div>
@@ -60,6 +63,16 @@ export default function ChatPage() {
             </>
           );
         })}
+        {isLoading && messages[messages.length - 1].role === "user" && (
+          <div className="flex p-2">
+            <div className="rounded-lg border border-stone-700 bg-stone-800 px-2.5 py-2 text-stone-300 shadow-md">
+              <div className="mb-0.5 text-right text-[10px] text-amber-400">
+                Ragette
+              </div>
+              <SpinnerIcon />
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
