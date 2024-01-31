@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useChat } from "ai/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Markdown from "react-markdown";
 import SpinnerIcon from "../components/icons/spinner";
 
@@ -22,6 +22,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    console.log(messages);
   }, [messages]);
 
   return (

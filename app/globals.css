@@ -24,3 +24,16 @@
 ::-webkit-scrollbar-thumb:hover {
   background: theme("colors.stone.600");
 }
+
+ol {
+  list-style-type: decimal;
+  margin: revert;
+  padding: revert;
+}
+
+ul,
+menu {
+  list-style-type: disc;
+  margin: revert;
+  padding: revert;
+}
