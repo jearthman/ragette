@@ -33,6 +33,8 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
       $vector: documentEmbeddings[index],
     }));
 
+    console.log("Astra docs: ", astraDocs);
+
     const db = new AstraDB(ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_API_ENDPOINT);
 
     const collection = await db.collection("ragette_cosine");
