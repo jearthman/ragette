@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     `\n\nSTART CONTEXT\n${context}\nEND CONTEXT`;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4",
+    model: "gpt-4-0125-preview",
     stream: true,
     messages: [systemPrompt, ...messages],
   });
