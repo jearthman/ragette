@@ -25,9 +25,13 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
 
     const embeddings = new OpenAIEmbeddings({
       modelName: "text-embedding-3-small",
+      maxConcurrency: 10,
+      // verbose: true,
     });
 
     console.log("Starting Embedding");
+
+    // for each string in
 
     const documentEmbeddings = await embeddings.embedDocuments(splitStrings);
 
