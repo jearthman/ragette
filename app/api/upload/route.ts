@@ -1,5 +1,6 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
+import { json } from "stream/consumers";
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
@@ -12,9 +13,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         pathname: string,
         clientPayload: string | null,
       ) => {
-        // Generate a client token for the browser to upload the file
-        // ⚠️ Authenticate and authorize users before generating the token.
-        // Otherwise, you're allowing anonymous uploads.
+        // Validate the clientPayload if needed
 
         return {
           tokenPayload: JSON.stringify({
@@ -27,15 +26,6 @@ export async function POST(request: Request): Promise<NextResponse> {
         // Get notified of client upload completion
         // ⚠️ This will not work on `localhost` websites,
         // Use ngrok or similar to get the full upload flow
-
-        console.log("blob upload completed", blob, tokenPayload);
-
-        try {
-          //kick off RAG file processing
-          console.log("kick off RAG file processing");
-        } catch (error) {
-          throw new Error("Could not process file");
-        }
       },
     });
 

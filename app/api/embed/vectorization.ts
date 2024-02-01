@@ -13,13 +13,13 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
 
     const docs = await loader.load();
 
-    console.log("Docs loaded: ", docs.length);
+    console.log("Docs loaded: ", JSON.stringify(docs));
 
     const splitter = new RecursiveCharacterTextSplitter();
 
     const splitDocs = await splitter.splitDocuments(docs);
 
-    console.log("Docs split: ", splitDocs.length);
+    console.log("Docs split: ", JSON.stringify(splitDocs));
 
     const splitStrings = splitDocs.map((doc) => doc.pageContent);
 
@@ -27,7 +27,7 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
 
     const documentEmbeddings = await embeddings.embedDocuments(splitStrings);
 
-    console.log("Document embeddings: ", documentEmbeddings);
+    console.log("Document embeddings: ", JSON.stringify(documentEmbeddings));
 
     const astraDocs = splitStrings.map((splitString, index) => ({
       fileId: fileId,
@@ -35,7 +35,7 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
       $vector: documentEmbeddings[index],
     }));
 
-    console.log("Astra docs: ", astraDocs);
+    console.log("Astra docs: ", JSON.stringify(astraDocs));
 
     const db = new AstraDB(ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_API_ENDPOINT);
 
