@@ -6,6 +6,7 @@ import SpinnerIcon from "../components/icons/spinner";
 import CheckIcon from "../components/icons/check";
 import { useRouter } from "next/navigation";
 import ChatIcon from "../components/icons/chat";
+import DragAndDrop from "../components/drag-and-drop";
 
 export default function FileUploadPage() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function FileUploadPage() {
   const fileIdRef = useRef<string | null>(null);
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
+  const [fileSizeFlag, setFileSizeFlag] = useState(false);
   const [uploadStep, setUploadStep] = useState(0);
   const [wrongFileType, setWrongFileType] = useState(false);
 
@@ -33,6 +35,66 @@ export default function FileUploadPage() {
     return result;
   };
 
+  async function processFile(file: File) {
+    setWrongFileType(false);
+
+    if (!file) {
+      return;
+    }
+
+    if (file.size > 1000000) {
+      setFileSizeFlag(true);
+    }
+
+    let tempFileName = file.name.split(".")[0];
+    if (tempFileName.length > 20) {
+      tempFileName = tempFileName.slice(0, 20) + "...";
+    }
+    setFileName(tempFileName);
+    if (
+      !file.type ||
+      !(
+        file.type === "application/pdf" ||
+        file.type === "text/plain" ||
+        file.type === "text/csv"
+      )
+    ) {
+      setWrongFileType(true);
+      return;
+    }
+    setFileType(file.name.split(".")[1].toUpperCase());
+
+    setUploadStep(1);
+
+    fileIdRef.current = generateID();
+
+    const uploadResponse = await upload(file.name, file, {
+      access: "public",
+      handleUploadUrl: "/api/upload",
+      clientPayload: fileIdRef.current,
+    });
+
+    if (uploadResponse.url) {
+      setUploadStep(2);
+
+      //send url to rag backend
+      const embedResponse = await fetch("/api/embed", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fileUrl: uploadResponse.url,
+          fileId: fileIdRef.current,
+        }),
+      });
+
+      if (embedResponse.ok) {
+        setUploadStep(3);
+      }
+    }
+  }
+
   return (
     <main className="flex h-screen w-screen flex-col items-center">
       <h1 className="mt-40 text-4xl font-bold tracking-wide text-stone-300 sm:mt-40 lg:mt-96">
@@ -42,69 +104,13 @@ export default function FileUploadPage() {
         Supports small .pdf, .csv, .txt files
       </h3>
 
-      <form className="flex gap-2">
+      {/* <form className="flex gap-2">
         <input
           name="file"
           ref={inputFileRef}
           type="file"
           hidden
-          onChange={async (e) => {
-            setWrongFileType(false);
-
-            if (!e.target.files) {
-              return;
-            }
-
-            const file = e.target.files[0];
-
-            if (!file) {
-              return;
-            }
-
-            setFileName(file.name.split(".")[0]);
-            if (
-              !file.type ||
-              !(
-                file.type === "application/pdf" ||
-                file.type === "text/plain" ||
-                file.type === "text/csv"
-              )
-            ) {
-              setWrongFileType(true);
-              return;
-            }
-            setFileType(file.name.split(".")[1].toUpperCase());
-
-            setUploadStep(1);
-
-            fileIdRef.current = generateID();
-
-            const uploadResponse = await upload(file.name, file, {
-              access: "public",
-              handleUploadUrl: "/api/upload",
-              clientPayload: fileIdRef.current,
-            });
-
-            if (uploadResponse.url) {
-              setUploadStep(2);
-
-              //send url to rag backend
-              const embedResponse = await fetch("/api/embed", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  fileUrl: uploadResponse.url,
-                  fileId: fileIdRef.current,
-                }),
-              });
-
-              if (embedResponse.ok) {
-                setUploadStep(3);
-              }
-            }
-          }}
+          onChange={(e) => processFile(e)}
         />
         <button
           className="mt-4 flex rounded-md bg-stone-700 px-2.5 py-2 text-stone-300 shadow-sm transition hover:bg-stone-600 hover:shadow-md active:bg-stone-700 active:shadow-inner disabled:opacity-30 disabled:hover:bg-stone-700"
@@ -131,7 +137,12 @@ export default function FileUploadPage() {
           </svg>
           Upload
         </button>
-      </form>
+      </form> */}
+
+      <DragAndDrop
+        processFile={processFile}
+        disabled={!!fileName && !wrongFileType}
+      />
       {wrongFileType && (
         <div className="mt-6 w-2/3 text-center text-sm text-red-400">
           File Type not supported currently. Please upload a .pdf, .csv, or .txt
@@ -168,6 +179,11 @@ export default function FileUploadPage() {
                   </div>
                   <div className="text-stone-400">Embedding for Vector DB</div>
                 </div>
+                {fileSizeFlag && uploadStep < 3 && (
+                  <div className="pt-2 text-xs text-amber-400 opacity-50">
+                    This may take a few minutes for larger files.
+                  </div>
+                )}
               </div>
             )}
           </div>
