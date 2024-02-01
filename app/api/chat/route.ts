@@ -10,12 +10,17 @@ const openai = new OpenAI({
 const { ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_API_ENDPOINT } = process.env;
 
 export async function POST(req: Request) {
+  console.log("POST function called");
+
   const { messages, fileId } = await req.json();
+  console.log(`Received messages: ${messages}, fileId: ${fileId}`);
 
   const lastUserMessage = messages[messages.length - 1];
   const embeddings = new OpenAIEmbeddings();
   const metadataFilter = { fileId: fileId };
   const embeddedQuery = await embeddings.embedQuery(lastUserMessage.content);
+  console.log(`Embedded query: ${embeddedQuery}`);
+
   const options = {
     sort: {
       $vector: embeddedQuery,
@@ -25,8 +30,12 @@ export async function POST(req: Request) {
 
   const db = new AstraDB(ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_API_ENDPOINT);
   const collection = await db.collection("ragette_cosine");
+  console.log(`Collection: ${collection}`);
   const cursor = await collection.find(metadataFilter, options);
+  console.log(`Cursor: ${cursor}`);
   const retrievedDocs = await cursor.toArray();
+  console.log(`Retrieved documents: ${retrievedDocs}`);
+
   const context = retrievedDocs.map((doc) => doc.text).join("\n");
 
   const systemPrompt = {
