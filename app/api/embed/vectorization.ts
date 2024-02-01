@@ -31,11 +31,9 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
 
     console.log("Starting Embedding");
 
-    // for each string in
-
     const documentEmbeddings = await embeddings.embedDocuments(splitStrings);
 
-    console.log("Document embeddings: ", JSON.stringify(documentEmbeddings));
+    // console.log("Document embeddings: ", JSON.stringify(documentEmbeddings));
 
     const astraDocs = splitStrings.map((splitString, index) => ({
       fileId: fileId,
