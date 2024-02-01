@@ -25,6 +25,8 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
 
     const embeddings = new OpenAIEmbeddings();
 
+    console.log("Starting Embedding");
+
     const documentEmbeddings = await embeddings.embedDocuments(splitStrings);
 
     console.log("Document embeddings: ", JSON.stringify(documentEmbeddings));
