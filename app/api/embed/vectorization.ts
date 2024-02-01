@@ -9,11 +9,17 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
   try {
     const loader = await LoaderFactory(file);
 
+    console.log("Loading returned: ", typeof loader);
+
     const docs = await loader.load();
+
+    console.log("Docs loaded: ", docs.length);
 
     const splitter = new RecursiveCharacterTextSplitter();
 
     const splitDocs = await splitter.splitDocuments(docs);
+
+    console.log("Docs split: ", splitDocs.length);
 
     const splitStrings = splitDocs.map((doc) => doc.pageContent);
 
@@ -31,7 +37,9 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
 
     const collection = await db.collection("ragette_cosine");
 
-    collection.insertMany(astraDocs);
+    const res = await collection.insertMany(astraDocs);
+
+    console.log("Inserted: ", res);
 
     return "DOCUMENT_STORED";
   } catch (error) {
