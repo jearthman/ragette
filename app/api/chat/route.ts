@@ -13,7 +13,9 @@ export async function POST(req: Request) {
   console.log("POST function called");
 
   const { messages, fileId } = await req.json();
-  console.log(`Received messages: ${messages}, fileId: ${fileId}`);
+  console.log(
+    `Received messages: ${JSON.stringify(messages)}, fileId: ${fileId}`,
+  );
 
   const lastUserMessage = messages[messages.length - 1];
   const embeddings = new OpenAIEmbeddings();
@@ -30,9 +32,9 @@ export async function POST(req: Request) {
 
   const db = new AstraDB(ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_API_ENDPOINT);
   const collection = await db.collection("ragette_cosine");
-  console.log(`Collection: ${collection}`);
+  console.log(`Collection: ${JSON.stringify(collection)}`);
   const cursor = await collection.find(metadataFilter, options);
-  console.log(`Cursor: ${cursor}`);
+  console.log(`Cursor: ${JSON.stringify(cursor)}`);
   const retrievedDocs = await cursor.toArray();
   console.log(`Retrieved documents: ${retrievedDocs}`);
 
