@@ -9,7 +9,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const file = await fileResponse.blob();
   try {
-    const retrievalResult = vectorizeFile(file, fileId);
+    const retrievalResult = await vectorizeFile(file, fileId);
 
     return new Response(JSON.stringify(retrievalResult), { status: 200 });
   } catch (error) {
