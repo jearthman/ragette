@@ -2,14 +2,9 @@ import LoaderFactory from "./loader-factory";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { AstraDB } from "@datastax/astra-db-ts";
 import { OpenAIEmbeddings } from "@langchain/openai";
+import { Pinecone, PineconeRecord } from "@pinecone-database/pinecone";
 
-const { ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_API_ENDPOINT } = process.env;
-
-type AstraDoc = {
-  fileId: string;
-  text: string;
-  $vector: number[];
-};
+const pc = new Pinecone();
 
 export default async function vectorizeFile(file: Blob, fileId: string) {
   try {
@@ -44,22 +39,24 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
       `${documentEmbeddings.length}/${splitStrings.length}`,
     );
 
-    const astraDocs: AstraDoc[] = splitStrings.map((splitString, index) => ({
-      fileId: fileId,
-      text: splitString,
-      $vector: documentEmbeddings[index],
-    }));
+    const pineconeRecords: PineconeRecord[] = documentEmbeddings.map(
+      (documentEmbedding, index) => ({
+        id: `${fileId}-${index}`,
+        values: documentEmbedding,
+        metadata: {
+          text: splitStrings[index],
+        },
+      }),
+    );
 
-    const astraBatches = chunkArray(astraDocs, 20);
+    const pineconeBatches = chunkArray(pineconeRecords, 100);
 
-    console.log("ASTRA DOCS LENGTH: ", astraDocs.length);
+    console.log("PINECONE RECORDS LENGTH: ", pineconeBatches.length);
 
-    const db = new AstraDB(ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_API_ENDPOINT);
+    const namespace = pc.index("ragette").namespace(fileId);
 
-    const collection = await db.collection("ragette_cosine");
-
-    const batchReq = astraBatches.map(async (batch) => {
-      const res = await collection.insertMany(batch);
+    const batchReq = pineconeBatches.map(async (batch) => {
+      const res = await namespace.upsert(batch);
       return res;
     });
 
@@ -74,8 +71,11 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
   }
 }
 
-const chunkArray = (arr: AstraDoc[], chunkSize: number): AstraDoc[][] => {
-  return arr.reduce((chunks: AstraDoc[][], elem, index) => {
+function chunkArray(
+  arr: PineconeRecord[],
+  chunkSize: number,
+): PineconeRecord[][] {
+  return arr.reduce((chunks: PineconeRecord[][], elem, index) => {
     const chunkIndex = Math.floor(index / chunkSize);
     if (!chunks[chunkIndex]) {
       chunks[chunkIndex] = [];
@@ -83,4 +83,4 @@ const chunkArray = (arr: AstraDoc[], chunkSize: number): AstraDoc[][] => {
     chunks[chunkIndex].push(elem);
     return chunks;
   }, []);
-};
+}
