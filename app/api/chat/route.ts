@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     // Query Pinecone for the most relevant documents.
     const namespace = pc.index("ragette").namespace(fileId);
     const queryRes = await namespace.query({
-      topK: 5,
+      topK: 10,
       vector: embeddedQuery,
       includeMetadata: true,
     });
