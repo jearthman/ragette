@@ -68,7 +68,7 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
 
     // Wait for all the batches to be stored.
     const batchRes = await Promise.all(batchReq);
-    console.log("Inserted: ", batchRes);
+    console.log("Inserted: ", batchRes.length);
 
     return "DOCUMENT_STORED";
   } catch (error) {
