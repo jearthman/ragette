@@ -62,9 +62,8 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
 
     // Store the batches in Pinecone.
     const namespace = pc.index("ragette").namespace(fileId);
-    const batchReq = pineconeBatches.map(async (batch) => {
-      const res = await namespace.upsert(batch);
-      return res;
+    const batchReq = pineconeBatches.map((batch) => {
+      return namespace.upsert(batch);
     });
 
     // Wait for all the batches to be stored.
