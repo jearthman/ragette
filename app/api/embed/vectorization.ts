@@ -5,6 +5,11 @@ import { Pinecone, PineconeRecord } from "@pinecone-database/pinecone";
 
 const pc = new Pinecone();
 
+type VectorizeRes = {
+  status: string;
+  progress?: number;
+};
+
 /**
  * Vectorizes a file by splitting it into documents, embedding the documents using OpenAI, and storing the embeddings in Pinecone.
  *
@@ -13,7 +18,10 @@ const pc = new Pinecone();
  * @returns A promise that resolves to "DOCUMENT_STORED" when the vectorization and storage process is complete.
  * @throws If an error occurs during the vectorization and storage process.
  */
-export default async function vectorizeFile(file: Blob, fileId: string) {
+export default async function* vectorizeFile(
+  file: Blob,
+  fileId: string,
+): AsyncGenerator<String, String, null> {
   try {
     // Load the file using the appropriate loader.
     const loader = await LoaderFactory(file);
@@ -21,13 +29,13 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
 
     // Split the file into documents.
     const docs = await loader.load();
-    console.log("Docs loaded: ", JSON.stringify(docs));
+    console.log("Docs loaded: ", JSON.stringify(docs.length));
 
     // Split the documents into smaller chunks of text.
     const splitter = new RecursiveCharacterTextSplitter();
     const splitDocs = await splitter.splitDocuments(docs);
 
-    console.log("Docs split: ", JSON.stringify(splitDocs));
+    console.log("Docs split: ", JSON.stringify(splitDocs.length));
 
     // Extract the text strings from the documents.
     const splitStrings = splitDocs.map((doc) => doc.pageContent);
@@ -38,7 +46,8 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
       maxConcurrency: 10,
       verbose: true,
     });
-    console.log("Starting Embedding");
+
+    yield "STARTING_EMBEDDING";
     const documentEmbeddings = await embeddings.embedDocuments(splitStrings);
     console.log(
       "Document embeddings count: ",
@@ -61,14 +70,24 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
     console.log("PINECONE RECORDS LENGTH: ", pineconeBatches.length);
 
     // Store the batches in Pinecone.
+    let completeBatchCount = 0;
     const namespace = pc.index("ragette").namespace(fileId);
-    const batchReq = pineconeBatches.map((batch) => {
-      return namespace.upsert(batch);
+    pineconeBatches.map((batch) => {
+      return namespace.upsert(batch).then(() => {
+        completeBatchCount++;
+      });
     });
 
+    while (completeBatchCount < pineconeBatches.length) {
+      yield "DOCUMENT_UPLOADING:" +
+        Math.floor((completeBatchCount / pineconeBatches.length) * 100);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+
     // Wait for all the batches to be stored.
-    const batchRes = await Promise.all(batchReq);
-    console.log("Inserted: ", batchRes.length);
+    // const batchRes = await Promise.all(batchReq);
+
+    console.log("Inserted");
 
     return "DOCUMENT_STORED";
   } catch (error) {
