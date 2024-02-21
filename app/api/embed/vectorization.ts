@@ -67,7 +67,6 @@ export default async function vectorizeFile(file: Blob, fileId: string) {
 
     return "DOCUMENT_STORED";
   } catch (error) {
-    console.log("Error: ", error);
     throw error;
   }
 }

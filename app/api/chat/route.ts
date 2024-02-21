@@ -8,18 +8,28 @@ const openai = new OpenAI({
 });
 
 const { ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_API_ENDPOINT } = process.env;
+const db = new AstraDB(ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_API_ENDPOINT);
 
+/**
+ * Handles the POST request for the chat route.
+ *
+ * @param req - The request object.
+ * @returns A streaming text response.
+ */
 export async function POST(req: Request) {
   console.log("POST function called");
 
+  // get message and fileId from request
   const { messages, fileId } = await req.json();
   console.log(
     `Received messages: ${JSON.stringify(messages)}, fileId: ${fileId}`,
   );
 
+  // get last user message
   const lastUserMessage = messages[messages.length - 1];
+
+  // embed the user query
   const embeddings = new OpenAIEmbeddings();
-  const metadataFilter = { fileId: fileId };
   const embeddedQuery = await embeddings.embedQuery(lastUserMessage.content);
   console.log(`Embedded query: ${embeddedQuery}`);
 
@@ -30,7 +40,10 @@ export async function POST(req: Request) {
     limit: 5,
   };
 
-  const db = new AstraDB(ASTRA_DB_APPLICATION_TOKEN, ASTRA_DB_API_ENDPOINT);
+  // filter by fileId
+  const metadataFilter = { fileId: fileId };
+
+  // query the database using the vector and fileId
   const collection = await db.collection("ragette_cosine");
   console.log(`Collection: ${JSON.stringify(collection)}`);
   const cursor = await collection.find(metadataFilter, options);
