@@ -7,6 +7,7 @@ import CheckIcon from "../components/icons/check";
 import { useRouter } from "next/navigation";
 import ChatIcon from "../components/icons/chat";
 import DragAndDrop from "../components/drag-and-drop";
+import RadialLoader from "../components/radial-loader";
 
 export default function FileUploadPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function FileUploadPage() {
   const [fileSizeFlag, setFileSizeFlag] = useState(false);
   const [uploadStep, setUploadStep] = useState(0);
   const [wrongFileType, setWrongFileType] = useState(false);
+  const [insertProgress, setInsertProgress] = useState(0);
 
   const generateID = (): string => {
     //ID for astra collection name
@@ -89,8 +91,21 @@ export default function FileUploadPage() {
         }),
       });
 
-      if (embedResponse.ok) {
-        setUploadStep(3);
+      const reader = embedResponse.body
+        ?.pipeThrough(new TextDecoderStream())
+        .getReader();
+      while (true) {
+        const result = await reader?.read();
+        if (result?.done) {
+          setUploadStep(4);
+          break;
+        }
+        console.log("Received: ", result?.value);
+        if (result?.value.includes("DOCUMENT_UPLOADING")) {
+          setUploadStep(3);
+          const progress = parseInt(result.value.split(":")[1]);
+          setInsertProgress(progress);
+        }
       }
     }
   }
@@ -170,24 +185,51 @@ export default function FileUploadPage() {
             </div>
 
             {uploadStep >= 2 && (
-              <div className="animate-fade-in-from-below pl-6">
-                <div className="my-1 ml-3 h-3 w-1 rounded-full bg-stone-700 opacity-70"></div>
-                <div className="flex items-center">
-                  <div className="mr-2 flex h-7 w-7 items-center justify-center rounded-full bg-stone-700">
-                    {uploadStep === 2 && <SpinnerIcon />}
-                    {uploadStep === 3 && <CheckIcon />}
+              <>
+                <div className="animate-fade-in-from-below pl-6">
+                  <div className="my-1 ml-3 h-3 w-1 rounded-full bg-stone-700 opacity-70"></div>
+                  <div className="flex items-center">
+                    <div className="mr-2 flex h-7 w-7 items-center justify-center rounded-full bg-stone-700">
+                      {uploadStep === 2 && <SpinnerIcon />}
+                      {uploadStep >= 3 && <CheckIcon />}
+                    </div>
+                    <div className="text-stone-400">Generating Embeddings</div>
                   </div>
-                  <div className="text-stone-400">Embedding for Vector DB</div>
+                  {fileSizeFlag && uploadStep < 3 && (
+                    <div className="pt-2 text-xs text-amber-400 opacity-50">
+                      This may take a few minutes for larger files.
+                    </div>
+                  )}
                 </div>
-                {fileSizeFlag && uploadStep < 3 && (
-                  <div className="pt-2 text-xs text-amber-400 opacity-50">
-                    This may take a few minutes for larger files.
+
+                {uploadStep >= 3 && (
+                  <div className="animate-fade-in-from-below pl-6">
+                    <div className="my-1 ml-3 h-3 w-1 rounded-full bg-stone-700 opacity-70"></div>
+                    <div className="flex items-center">
+                      <div className="mr-2 flex h-7 w-7 items-center justify-center rounded-full bg-stone-700">
+                        {uploadStep === 3 && insertProgress <= 0 && (
+                          <SpinnerIcon />
+                        )}
+                        {uploadStep === 3 && insertProgress > 0 && (
+                          <RadialLoader percent={insertProgress} />
+                        )}
+                        {uploadStep === 4 && <CheckIcon />}
+                      </div>
+                      <div className=" text-stone-400">
+                        Inserting Vectors
+                        {/* <div className="h-1 w-full rounded-full bg-stone-700">
+                          <div
+                            className={`h-1 w-[${insertProgress}%] rounded-full bg-amber-400 transition-all duration-200`}
+                          ></div>
+                        </div> */}
+                      </div>
+                    </div>
                   </div>
                 )}
-              </div>
+              </>
             )}
           </div>
-          {uploadStep === 3 && (
+          {uploadStep === 4 && (
             <button
               onClick={() => router.push(`/chat?fileId=${fileIdRef.current}`)}
               className="mt-4 flex animate-fade-in gap-2 rounded-md border border-lime-700 bg-lime-900 px-2.5 py-2 text-lime-100 shadow-sm transition hover:bg-lime-800 hover:shadow-md active:bg-lime-900 active:shadow-inner disabled:opacity-30 disabled:hover:bg-lime-800"

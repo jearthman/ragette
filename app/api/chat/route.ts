@@ -17,7 +17,7 @@ const openai = new OpenAI({
  * @returns A streaming text response.
  */
 export async function POST(req: Request) {
-  console.log("POST function called");
+  console.log("chat POST function called");
 
   const { messages, fileId } = await req.json();
   console.log(
