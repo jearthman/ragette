@@ -1,8 +1,5 @@
 import { OpenAIEmbeddings, ChatOpenAI } from "@langchain/openai";
 import { Pinecone } from "@pinecone-database/pinecone";
-import { z } from "Zod";
-import { convertToOpenAITool } from "@langchain/core/utils/function_calling";
-import { DynamicStructuredTool } from "@langchain/core/tools";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { GradingPrompt, TransformPrompt } from "./prompt-templates";
 import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
@@ -90,21 +87,22 @@ export async function grade(state) {
     const filteredDocs = [];
     let tramsformQuery = false;
 
-    for (const doc of docs) {
-      const result = await chain.invoke({
-        context: doc,
-        question: question,
-      });
-      const grade = result.content.toLowerCase();
-      if (grade === "yes") {
-        filteredDocs.push(doc);
-        break;
-      }
-    }
+    docs.map((doc) => {
+      chain
+        .invoke({
+          context: doc,
+          question: question,
+        })
+        .then((result) => {
+          const grade = result.content.toLowerCase();
+          if (grade === "yes") {
+            filteredDocs.push(doc);
+            return;
+          }
+        });
+    });
 
-    if (filteredDocs.length === 0) {
-      tramsformQuery = true;
-    }
+    tramsformQuery = true;
 
     return {
       ...state,
