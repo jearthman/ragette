@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@datastax/astra-db-ts": "^0.1.4",
+    "@langchain/core": "^0.1.42",
     "@langchain/langgraph": "^0.0.10",
     "@langchain/openai": "^0.0.12",
     "@microsoft/fetch-event-source": "^2.0.1",
