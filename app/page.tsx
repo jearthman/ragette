@@ -6,7 +6,7 @@ import GithubSignInButton from "./components/github-sign-in-button";
 
 export default function Home() {
   return (
-    <main className="flex h-screen w-screen flex-col items-center">
+    <main className="flex h-screen w-screen flex-col items-center justify-center">
       <div className="relative">
         <Image
           priority
@@ -14,7 +14,7 @@ export default function Home() {
           alt="picture of ragette"
           width={200}
           height={200}
-          className=" ml-3 mt-24 lg:mt-96"
+          className="ml-3"
         ></Image>
         <div className="absolute inset-0 bg-gradient-to-t from-stone-900 to-transparent to-20%"></div>
       </div>

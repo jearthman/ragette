@@ -58,32 +58,11 @@ export async function grade(state) {
 
     kv.set(`file_status:${fileId}`, "Getting useful info");
 
-    // const grade = z.object({
-    //   binary_score: z
-    //     .string()
-    //     .refine((value) => value === "yes" || value === "no", {
-    //       message: "Relevance score must be 'yes' or 'no'",
-    //     }),
-    // });
-
-    // const tool = new DynamicStructuredTool({
-    //   name: "relevance-check",
-    //   description: "Binary score for relevance check",
-    //   schema: grade,
-    //   func: async ({ binary_score }) => {
-    //     return binary_score;
-    //   },
-    // });
-
     const model = new ChatOpenAI({
       temperature: 0,
       modelName: "gpt-4-0125-preview",
       streaming: true,
     });
-
-    // const gradingTool = convertToOpenAITool(tool);
-
-    // const llmWithTool = model.bind({ tools: [gradingTool] });
 
     const prompt = GradingPrompt;
 

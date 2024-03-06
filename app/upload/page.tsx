@@ -112,7 +112,8 @@ export default function FileUploadPage() {
 
   return (
     <main className="flex h-screen w-screen flex-col items-center">
-      <h1 className="mt-40 text-4xl font-bold tracking-wide text-stone-300 sm:mt-40 lg:mt-96">
+      <div className="h-1/5"></div>
+      <h1 className="text-4xl font-bold tracking-wide text-stone-300">
         Upload Your <span className="underline decoration-amber-400">File</span>
       </h1>
       <h3 className="text-md text-stone-400">
@@ -232,7 +233,7 @@ export default function FileUploadPage() {
           {uploadStep === 4 && (
             <button
               onClick={() => router.push(`/chat?fileId=${fileIdRef.current}`)}
-              className="mt-4 flex animate-fade-in gap-2 rounded-md border border-lime-700 bg-lime-900 px-2.5 py-2 text-lime-100 shadow-sm transition hover:bg-lime-800 hover:shadow-md active:bg-lime-900 active:shadow-inner disabled:opacity-30 disabled:hover:bg-lime-800"
+              className="mb-8 mt-4 flex animate-fade-in gap-2 rounded-md border border-lime-700 bg-lime-900 px-2.5 py-2 text-lime-100 shadow-sm transition hover:bg-lime-800 hover:shadow-md active:bg-lime-900 active:shadow-inner disabled:opacity-30 disabled:hover:bg-lime-800"
             >
               <ChatIcon />
               Start Chat

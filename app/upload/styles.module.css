@@ -8,3 +8,7 @@
     transform: translateY(0);
   }
 }
+
+.third-viewport-height {
+  margin-top: 33.33vh;
+}
