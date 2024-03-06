@@ -5,6 +5,7 @@ import { useChat } from "ai/react";
 import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import SpinnerIcon from "../components/icons/spinner";
+import UserIcon from "../components/icons/user";
 
 export default function ChatPage() {
   const searchParams = useSearchParams();
@@ -84,6 +85,11 @@ export default function ChatPage() {
                   message.role === "user" ? "justify-end" : "justify-start"
                 }`}
               >
+                {message.role === "assistant" && (
+                  <div className="mr-2 mt-1 flex h-8 w-8 items-center justify-center rounded-full border border-stone-600 bg-stone-800 text-2xl font-extralight text-amber-400">
+                    R
+                  </div>
+                )}
                 <div
                   className={`rounded-lg px-2.5 py-2 ${
                     message.role === "user"
@@ -91,15 +97,13 @@ export default function ChatPage() {
                       : "border border-stone-700 bg-stone-800 text-stone-300 shadow-md"
                   }`}
                 >
-                  <div
-                    className={`mb-0.5 text-[10px] text-amber-400 ${
-                      message.role === "user" ? "text-right" : "text-left"
-                    } `}
-                  >
-                    {message.role === "user" ? "You" : "Ragette"}
-                  </div>
                   <Markdown>{message.content}</Markdown>
                 </div>
+                {message.role === "user" && (
+                  <div className="ml-2 mt-1 flex h-8 w-8 items-center justify-center rounded-full border border-stone-600 bg-stone-800 text-amber-400">
+                    <UserIcon />
+                  </div>
+                )}
               </div>
             </>
           );
