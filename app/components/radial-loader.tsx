@@ -19,11 +19,11 @@ export default function RadialLoader({ percent }: RadialLoaderProps) {
         cy="12"
       />
       <circle
-        className="text-amber-400"
+        className="text-amber-400 transition-[stroke-dashoffset] duration-300 ease-linear"
         strokeWidth="4"
         strokeDasharray={circumference}
         strokeDashoffset={strokeDashoffset}
-        strokeLinecap="square"
+        strokeLinecap="butt"
         stroke="currentColor"
         fill="transparent"
         r={radius}

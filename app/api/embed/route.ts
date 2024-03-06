@@ -1,4 +1,5 @@
 import vectorizeFile from "./vectorization";
+import { del } from "@vercel/blob";
 
 export async function POST(request: Request): Promise<Response> {
   const body = await request.json();
@@ -8,6 +9,8 @@ export async function POST(request: Request): Promise<Response> {
   const fileResponse = await fetch(fileUrl);
 
   const file = await fileResponse.blob();
+
+  del(fileUrl);
   try {
     const vectorizationIter = vectorizeFile(file, fileId);
     const vectorizationStream = iteratorToStream(vectorizationIter);
