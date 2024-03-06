@@ -3,6 +3,7 @@ import { Pinecone } from "@pinecone-database/pinecone";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { GradingPrompt, TransformPrompt } from "./prompt-templates";
 import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
+import { kv } from "@vercel/kv";
 
 const pc = new Pinecone();
 
@@ -12,6 +13,8 @@ export async function retrieve(state) {
   try {
     let { question, fileId, retryCount } = state;
 
+    kv.set(`file_status:${fileId}`, "Reading file");
+
     if (!retryCount) {
       retryCount = 1;
     } else {
@@ -20,7 +23,7 @@ export async function retrieve(state) {
 
     const embeddings = new OpenAIEmbeddings();
     const embeddedQuery = await embeddings.embedQuery(question);
-    console.log(`Embedded query: ${embeddedQuery}`);
+    console.log(`Embedded query`);
 
     // Query Pinecone for the most relevant documents.
     const namespace = pc.index("ragette").namespace(fileId);
@@ -29,7 +32,7 @@ export async function retrieve(state) {
       vector: embeddedQuery,
       includeMetadata: true,
     });
-    console.log(`Query Res: ${JSON.stringify(queryRes)}`);
+    console.log(`Query Res`);
     // Extract the context from the most relevant documents.
     const docs = queryRes.matches
       .map((record) =>
@@ -51,7 +54,9 @@ export async function retrieve(state) {
 
 export async function grade(state) {
   try {
-    const { question, docs } = state;
+    const { question, docs, fileId } = state;
+
+    kv.set(`file_status:${fileId}`, "Getting useful info");
 
     // const grade = z.object({
     //   binary_score: z
@@ -85,7 +90,7 @@ export async function grade(state) {
     const chain = prompt.pipe(model);
 
     const filteredDocs = [];
-    let tramsformQuery = false;
+    let promiseCount = 0;
 
     docs.map((doc) => {
       chain
@@ -94,20 +99,31 @@ export async function grade(state) {
           question: question,
         })
         .then((result) => {
+          promiseCount++;
           const grade = result.content.toLowerCase();
           if (grade === "yes") {
+            console.log("RELEVANT DOC FOUND: ", doc);
             filteredDocs.push(doc);
             return;
           }
         });
     });
 
-    tramsformQuery = true;
+    while (promiseCount < docs.length) {
+      if (filteredDocs.length > 0) {
+        return {
+          ...state,
+          docs: filteredDocs,
+          tramsformQuery: false,
+        };
+      }
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
 
     return {
       ...state,
       docs: filteredDocs,
-      tramsformQuery: tramsformQuery,
+      tramsformQuery: filteredDocs.length === 0,
     };
   } catch (error) {
     console.log(error);
@@ -116,7 +132,9 @@ export async function grade(state) {
 
 export async function transformQuery(state) {
   try {
-    const { question } = state;
+    const { question, fileId } = state;
+
+    kv.set(`file_status:${fileId}`, "Re-evaluating question");
 
     const prompt = TransformPrompt;
 
@@ -143,7 +161,9 @@ export async function transformQuery(state) {
 
 export async function webSearch(state) {
   try {
-    const { question, docs } = state;
+    const { question, docs, fileId } = state;
+
+    kv.set(`file_status:${fileId}`, "Searching the web");
 
     const tool = new TavilySearchResults({ maxResults: 1 });
 
@@ -167,7 +187,7 @@ export function decideToChat(state) {
     if (state.tramsformQuery) {
       return "transform_query";
     } else {
-      return "END";
+      return "end";
     }
   } catch (error) {
     console.log(error);

@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useChat } from "ai/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import SpinnerIcon from "../components/icons/spinner";
 
@@ -16,6 +16,9 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  const [fileStatus, setFileStatus] = useState("");
+  const [FuleStatusError, setFileStatusError] = useState("");
+
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -24,6 +27,43 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     console.log(messages);
   }, [messages]);
+
+  async function handleNewMessage(e: React.FormEvent<HTMLFormElement>) {
+    setFileStatus("");
+    setFileStatusError("");
+
+    handleSubmit(e, { options: { body: { fileId } } });
+
+    /*
+
+    Set up an SSE route to get file processing status, commenting out for the time being since the response is so fast.
+    Saving for future reference or use.
+
+    */
+
+    // const eventSource = new EventSource(`/api/status?fileId=${fileId}`, {
+    //   withCredentials: true,
+    // });
+
+    // eventSource.onopen = () => {
+    //   console.log("Connection to status route opened.");
+    // };
+
+    // eventSource.onmessage = (event) => {
+    //   console.log("Received:", event.data);
+    //   setFileStatus(event.data);
+    //   if (event.data === "Done") {
+    //     eventSource.close();
+    //   }
+    // };
+
+    // eventSource.onerror = (error) => {
+    //   console.error(error.currentTarget, error.type);
+    //   console.error("EventSource failed:", error);
+    //   setFileStatusError("Error reading file status");
+    //   eventSource.close();
+    // };
+  }
 
   return (
     <main className="md:1/2 mx-auto flex h-screen w-full flex-col pb-2 lg:w-1/3">
@@ -67,10 +107,13 @@ export default function ChatPage() {
         {isLoading && messages[messages.length - 1].role === "user" && (
           <div className="flex p-2">
             <div className="rounded-lg border border-stone-700 bg-stone-800 px-2.5 py-2 text-stone-300 shadow-md">
-              <div className="mb-0.5 text-right text-[10px] text-amber-400">
+              <div className="mb-0.5 text-left text-[10px] text-amber-400">
                 Ragette
               </div>
-              <SpinnerIcon />
+              <div className="flex items-center">
+                <SpinnerIcon />
+                <div className="ml-2 animate-pulse">Reading your file</div>
+              </div>
             </div>
           </div>
         )}
@@ -78,7 +121,7 @@ export default function ChatPage() {
       </div>
 
       <form
-        onSubmit={(e) => handleSubmit(e, { options: { body: { fileId } } })}
+        onSubmit={(e) => handleNewMessage(e)}
         className="mx-2 flex rounded-lg bg-stone-800 text-stone-300 ring-transparent focus-within:ring-1 focus-within:ring-stone-700"
       >
         <input

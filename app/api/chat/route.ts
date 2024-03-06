@@ -4,6 +4,7 @@ import { Pinecone } from "@pinecone-database/pinecone";
 import { QuestionCheckPrompt, SystemPrompt } from "./prompt-templates";
 import { StateGraph, END } from "@langchain/langgraph";
 import * as nodes from "./nodes";
+import { kv } from "@vercel/kv";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -94,6 +95,7 @@ export async function POST(req: Request) {
     const result = await app?.invoke(inputs);
 
     context = result.docs.join("\n");
+    kv.set("file_status:" + fileId, "Done");
   }
 
   // Format the system prompt with the context.

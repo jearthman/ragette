@@ -16,6 +16,7 @@
     "@pinecone-database/pinecone": "^2.0.1",
     "@vercel/analytics": "^1.2.1",
     "@vercel/blob": "^0.18.0",
+    "@vercel/kv": "^1.0.1",
     "ai": "^2.2.35",
     "d3-dsv": "^2.0.0",
     "langchain": "^0.1.20",

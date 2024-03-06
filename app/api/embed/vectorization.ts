@@ -29,6 +29,7 @@ export default async function* vectorizeFile(
 
     // Split the file into documents.
     const docs = await loader.load();
+    console.log("METADATA EXAMPLE: ", JSON.stringify(docs[0].metadata));
     console.log("Docs loaded: ", JSON.stringify(docs.length));
 
     // Split the documents into smaller chunks of text.
@@ -65,11 +66,11 @@ export default async function* vectorizeFile(
       }),
     );
 
-    // Split the records into smaller batches to avoid exceeding the Pinecone API's payload size limit.
+    // Split the records into smaller batches
     const pineconeBatches = chunkArray(pineconeRecords, 100);
     console.log("PINECONE RECORDS LENGTH: ", pineconeBatches.length);
 
-    // Store the batches in Pinecone.
+    // Store the batches in Pinecone
     let completeBatchCount = 0;
     const namespace = pc.index("ragette").namespace(fileId);
     pineconeBatches.map((batch) => {
@@ -78,16 +79,19 @@ export default async function* vectorizeFile(
       });
     });
 
+    // yield progress of completed promises to the client
     while (completeBatchCount < pineconeBatches.length) {
       yield "DOCUMENT_UPLOADING:" +
         Math.floor((completeBatchCount / pineconeBatches.length) * 100);
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 200));
     }
 
     // Wait for all the batches to be stored.
     // const batchRes = await Promise.all(batchReq);
 
     console.log("Inserted");
+
+    //remove document from blob storage
 
     return "DOCUMENT_STORED";
   } catch (error) {
