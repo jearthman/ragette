@@ -110,10 +110,10 @@ export default function ChatPage() {
         })}
         {isLoading && messages[messages.length - 1].role === "user" && (
           <div className="flex p-2">
+            <div className="mr-2 mt-1 flex h-8 w-8 min-w-8 items-center justify-center rounded-full border border-stone-600 bg-stone-800 text-2xl font-extralight text-amber-400">
+              R
+            </div>
             <div className="rounded-lg border border-stone-700 bg-stone-800 px-2.5 py-2 text-stone-300 shadow-md">
-              <div className="mb-0.5 text-left text-[10px] text-amber-400">
-                Ragette
-              </div>
               <div className="flex items-center">
                 <SpinnerIcon />
                 <div className="ml-2 animate-pulse">Reading your file</div>
