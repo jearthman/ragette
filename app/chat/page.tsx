@@ -86,7 +86,7 @@ export default function ChatPage() {
                 }`}
               >
                 {message.role === "assistant" && (
-                  <div className="mr-2 mt-1 flex h-8 w-8 items-center justify-center rounded-full border border-stone-600 bg-stone-800 text-2xl font-extralight text-amber-400">
+                  <div className="mr-2 mt-1 flex h-8 w-8 min-w-8 items-center justify-center rounded-full border border-stone-600 bg-stone-800 text-2xl font-extralight text-amber-400">
                     R
                   </div>
                 )}
@@ -100,7 +100,7 @@ export default function ChatPage() {
                   <Markdown>{message.content}</Markdown>
                 </div>
                 {message.role === "user" && (
-                  <div className="ml-2 mt-1 flex h-8 w-8 items-center justify-center rounded-full border border-stone-600 bg-stone-800 text-amber-400">
+                  <div className="ml-2 mt-1 flex h-8 w-8 min-w-8 items-center justify-center rounded-full border border-stone-600 bg-stone-800 text-amber-400">
                     <UserIcon />
                   </div>
                 )}

@@ -41,6 +41,9 @@ dependencies:
   langchain:
     specifier: ^0.1.25
     version: 0.1.25(@datastax/astra-db-ts@0.1.4)(@pinecone-database/pinecone@2.0.1)(@vercel/kv@1.0.1)(d3-dsv@2.0.0)(pdf-parse@1.1.1)
+  langsmith:
+    specifier: ^0.1.13
+    version: 0.1.13
   next:
     specifier: 14.0.4
     version: 14.0.4(react-dom@18.2.0)(react@18.2.0)
