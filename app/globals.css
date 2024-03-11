@@ -41,3 +41,7 @@ menu {
 .fifth-viewport-height {
   margin-top: 20vh;
 }
+
+p + p {
+  margin-top: 1rem;
+}
