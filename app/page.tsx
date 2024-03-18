@@ -1,6 +1,4 @@
 import Image from "next/image";
-import { useChat } from "ai/react";
-import { useRef, RefObject } from "react";
 import GoogleSignInButton from "./components/google-sign-in-button";
 import GithubSignInButton from "./components/github-sign-in-button";
 
